@@ -14,11 +14,17 @@ jobs:
       - name: Checkout the code
         uses: actions/checkout@v2
 
-      - name: executing remote ssh commands using password
+      - name: Prepare SSH private key
+        run: |
+          mkdir -p ~/.ssh
+          printf '%b' "${{ secrets.PRIVATE_SSH }}" | tr -d '\r' > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+
+      - name: Execute remote SSH commands
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: 98.130.15.49
           username: ubuntu
-          key: ${{ secrets.PRIVATE_SSH }}
+          key_path: ~/.ssh/deploy_key
           port: 22
           script: ./deploy.sh
